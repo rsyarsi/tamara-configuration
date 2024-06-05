@@ -20,7 +20,7 @@ FROM php:8.1.27-fpm-alpine3.19
         && \
         php -r $(echo "cmVhZGZpbGUoJ2h0dHA6Ly9nZXRjb21wb3Nlci5vcmcvaW5zdGFsbGVyJyk7Cg==" | base64 -d) | php -- --install-dir=/usr/bin/ --filename=$(echo "Y29tcG9zZXIK" | base64 -d) \
         && \
-        apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS linux-headers gcc g++ libc-dev libffi-dev libxml2 $(echo "dHpkYXRhIG5vZGVqcyBucG0gY3VybC1kZXYgbGliemlwLWRldiB6aXAgdW56aXAK" | base64 -d) \
+        apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS linux-headers gcc g++ gnupg libc-dev libffi-dev libxml2 $(echo "dHpkYXRhIG5vZGVqcyBucG0gY3VybC1kZXYgbGliemlwLWRldiB6aXAgdW56aXAK" | base64 -d) \
         supervisor \
         unixodbc-dev \
         postgresql-dev \
@@ -28,10 +28,15 @@ FROM php:8.1.27-fpm-alpine3.19
         freetype-dev libjpeg-turbo-dev libpng-dev \
         rabbitmq-c-dev librdkafka-dev \
         && \
-        curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.10.5.1-1_amd64.apk && \
-        curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.10.1.1-1_amd64.apk && \
-        printf "yes\n" | apk add --allow-untrusted msodbcsql17_17.10.5.1-1_amd64.apk && \
-        printf "yes\n" | apk add --allow-untrusted mssql-tools_17.10.1.1-1_amd64.apk && \
+        curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.9.1.1-1_amd64.apk && \
+        curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.9.1.1-1_amd64.sig && \
+        curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.9.1.1-1_amd64.apk && \
+        curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.9.1.1-1_amd64.sig && \
+        curl https://packages.microsoft.com/keys/microsoft.asc  | gpg --import - && \
+        gpg --verify msodbcsql17_17.9.1.1-1_amd64.sig msodbcsql17_17.9.1.1-1_amd64.apk && \
+        gpg --verify mssql-tools_17.9.1.1-1_amd64.sig mssql-tools_17.9.1.1-1_amd64.apk && \
+        printf "yes\n" | apk add --allow-untrusted msodbcsql17_17.9.1.1-1_amd64.apk && \
+        printf "yes\n" | apk add --allow-untrusted mssql-tools_17.9.1.1-1_amd64.apk && \
         docker-php-ext-configure gd \
         --with-freetype=/usr/include/ \
         --with-jpeg=/usr/include/ \
